@@ -1,27 +1,35 @@
-package utils;
-
+package tpe.utils;
+import tpe.Procesador;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import main.Tarea;
-import main.Procesador;
+import tpe.Tarea;
 
 public class CSVReader {
 
 	public CSVReader() {
 	}
 	
-	public List<Tarea> readTasks(String taskPath) {
-		List<Tarea> tareas = new ArrayList<Tarea>();
+	
+	/*public void getProcesadores(){
+		for(int i = 0;i< procesadores.size();i++){
+			System.out.println(procesadores.get(i).getCodigo() + " " + procesadores.get(i).getAnio() + " " + procesadores.get(i).getId()
+					+ " " + procesadores.get(i).isRefrigerado());
+			procesadores.get(i).traerTareas();
+		}
+	}*/
+	
+	public ArrayList<Tarea> readTasks(String taskPath) {
+		
 		// Obtengo una lista con las lineas del archivo
 		// lines.get(0) tiene la primer linea del archivo
-		// lines.get(1) tiene la segunda linea del archivo... y así
+		// lines.get(1) tiene la segunda linea del archivo... y asi
 		ArrayList<String[]> lines = this.readContent(taskPath);
+		ArrayList<Tarea> tareas = new ArrayList<>();
 		
 		for (String[] line: lines) {
 			// Cada linea es un arreglo de Strings, donde cada posicion guarda un elemento
@@ -31,22 +39,19 @@ public class CSVReader {
 			Boolean critica = Boolean.parseBoolean(line[3].trim());
 			Integer prioridad = Integer.parseInt(line[4].trim());
 			// Aca instanciar lo que necesiten en base a los datos leidos
-			
-			Tarea tarea = new Tarea(id, nombre, tiempo, critica, prioridad);
-			tareas.add(tarea);
-			
+			Tarea t1 = new Tarea(id,nombre,tiempo,critica,prioridad);
+			tareas.add(t1);
 		}
-		
 		return tareas;
 	}
 	
-	public List<Procesador> readProcessors(String processorPath) {
-		List<Procesador> procesadores = new ArrayList<Procesador>();
+public ArrayList<Procesador> readProcessors(String processorPath) {
 		
 		// Obtengo una lista con las lineas del archivo
 		// lines.get(0) tiene la primer linea del archivo
-		// lines.get(1) tiene la segunda linea del archivo... y así
+		// lines.get(1) tiene la segunda linea del archivo... y asi
 		ArrayList<String[]> lines = this.readContent(processorPath);
+		ArrayList<Procesador> procesadores = new ArrayList<>();
 		
 		for (String[] line: lines) {
 			// Cada linea es un arreglo de Strings, donde cada posicion guarda un elemento
@@ -55,14 +60,9 @@ public class CSVReader {
 			Boolean refrigerado = Boolean.parseBoolean(line[2].trim());
 			Integer anio = Integer.parseInt(line[3].trim());
 			// Aca instanciar lo que necesiten en base a los datos leidos
-			
-
-			Procesador pcs = new Procesador(id, codigo, refrigerado, anio);
-			
-			procesadores.add(pcs);
-		
+			Procesador p1 = new Procesador(id,codigo,refrigerado,anio);
+			procesadores.add(p1);
 		}
-		
 		return procesadores;
 	}
 
