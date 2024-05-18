@@ -1,7 +1,5 @@
 package tpe;
 
-import java.util.ArrayList;
-
 public class Tree {
 
 	private TreeNode root;
@@ -9,6 +7,7 @@ public class Tree {
 	public Tree() {
 		this.root = null;
 	}
+
 	
 	public void add(Tarea value) {
 		if (this.root == null)

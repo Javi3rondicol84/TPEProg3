@@ -17,12 +17,17 @@ public class Servicios {
 	
 	private LinkedList<Tarea> criticas;
 	private LinkedList<Tarea> noCriticas;
-	private ArrayList<Tarea> tareas;
+	private LinkedList<Tarea> tareas;
 	private HashMap<String,Tarea> hashMap;
 	private Tree arbol; 
+	private HashMap<Integer,LinkedList<Tarea>> hashMapPrioridades; //integer de 1 a 100 (prioridad de la tarea)
 
 	/*
      * Expresar la complejidad temporal del constructor.
+     * la complejidad computacional del constructor es O(n) * O(h) donde n son los metodos que llama para rellenar las diferentes
+     * estructuras (son 4 metodos, rellenarHashMap(),rellenarLista(),rellenarHashPrioridades() tienen complejidad computacion O(n)
+     * y rellenarArbol() tiene complejidad computacional O(n) * O(h) en total seria O(n) * 4 * O(n) y nos termina quedando
+     * O(n) * O(h)) y donde h es la altura del arbol que como maximo va a ser 100 ya que esta ordenado por prioridad
      */
 	public Servicios(String pathProcesadores, String pathTareas)
 	{
@@ -33,10 +38,19 @@ public class Servicios {
 		this.noCriticas = new LinkedList<>();
 		this.hashMap = new HashMap<>();
 		this.arbol = new Tree();
+		this.hashMapPrioridades = new HashMap<>();
 		this.rellenarHashMap();
 		this.rellenarLista();
+		this.rellenarHashPrioridades();
 		this.rellenarArbol();
 		
+	}
+	
+
+	private void rellenarHashPrioridades(){
+		for(int i = 1; i <= 100; i++){
+			hashMapPrioridades.put(i, new LinkedList<Tarea>());
+		}
 	}
 	
 	
@@ -49,6 +63,7 @@ public class Servicios {
 	private void rellenarArbol(){
 		for(int i = 0; i < tareas.size(); i++){
 			this.arbol.add(tareas.get(i));
+			hashMapPrioridades.get(tareas.get(i).getPrioridad()).add(tareas.get(i));
 		}
 	}
 	
@@ -62,12 +77,13 @@ public class Servicios {
 		}
 	}
 	 
-	private ArrayList<Tarea> buscarMinMax(TreeNode actual, int prioridadInferior, int prioridadSuperior, ArrayList<Tarea> lista){
+	private LinkedList<Tarea> buscarMinMax(TreeNode actual, int prioridadInferior, int prioridadSuperior, LinkedList<Tarea> lista){
 		if(actual == null){
 			return lista;
 		}
 			if(actual.getValue().getPrioridad() > prioridadInferior && actual.getValue().getPrioridad() < prioridadSuperior){
-				lista.add(actual.getValue());
+				LinkedList<Tarea> tareas = hashMapPrioridades.get(actual.getValue().getPrioridad());
+				lista.addAll(tareas);
 				buscarMinMax(actual.getLeft(),prioridadInferior,prioridadSuperior,lista);
 				buscarMinMax(actual.getRight(),prioridadInferior,prioridadSuperior,lista);
 			}
@@ -108,16 +124,17 @@ public class Servicios {
 
     /*
      * Expresar la complejidad temporal del servicio 3.
-     * La complejidad computacional de este servicio en el peor de los casos es O(n), debido a que los valores maximo y minimo que nos
+     * La complejidad computacional de este servicio en el peor de los casos es O(n) * O(t) donde n son las prioridades que van de 1 a 100 
+     * como maximo y donde t son las lista de factoreo asociada a cada prioridad, debido a que los valores maximo y minimo que nos
      * pasa el usuario podrian encontrarse entre la hoja mas izquierda y la hoja mas derecha del arbol, pero en promedio este servicio 
-     * baja su complejidad a O(log n), porque en muchas ocaciones no es necesario recorrer todo el arbol, ya que este corta antes cuando 
-     * encuentra un valor contemplado dentro del rango.
+     * baja su complejidad a O(log n) * O(t), porque en muchas ocaciones no es necesario recorrer todo el arbol, ya que este corta antes
+     * cuando encuentra un valor contemplado dentro del rango.
      */
 	public List<Tarea> servicio3(int prioridadInferior, int prioridadSuperior) {
 		if(this.arbol.getRaiz() == null){
 			return new ArrayList<>();
 		}
-		return buscarMinMax(this.arbol.getRaiz(),prioridadInferior,prioridadSuperior,new ArrayList<Tarea>());
+		return buscarMinMax(this.arbol.getRaiz(),prioridadInferior,prioridadSuperior, new LinkedList<Tarea>());
 	}
 
 }
