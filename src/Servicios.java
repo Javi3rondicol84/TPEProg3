@@ -18,6 +18,7 @@ public class Servicios {
 	private LinkedList<Tarea> criticas;
 	private LinkedList<Tarea> noCriticas;
 	private LinkedList<Tarea> tareas;
+	private LinkedList<Procesador> procesadores;
 	private HashMap<String,Tarea> hashMap;
 	private Tree arbol; 
 	private HashMap<Integer,LinkedList<Tarea>> hashMapPrioridades; //integer de 1 a 100 (prioridad de la tarea)
@@ -32,8 +33,8 @@ public class Servicios {
 	public Servicios(String pathProcesadores, String pathTareas)
 	{
 		CSVReader reader = new CSVReader();
-		reader.readProcessors(pathProcesadores);
 		this.tareas = reader.readTasks(pathTareas);
+		this.procesadores = reader.readProcessors(pathProcesadores);
 		this.criticas = new LinkedList<>();
 		this.noCriticas = new LinkedList<>();
 		this.hashMap = new HashMap<>();
@@ -44,6 +45,14 @@ public class Servicios {
 		this.rellenarHashPrioridades();
 		this.rellenarArbol();
 		
+	}
+	
+	public LinkedList<Tarea> getListaTareas(){
+		return new LinkedList<Tarea>(this.tareas);
+	}
+	
+	public LinkedList<Procesador> getListaProcesadores(){
+		return new LinkedList<Procesador>(procesadores);
 	}
 	
 
@@ -128,11 +137,12 @@ public class Servicios {
      * como maximo y donde t son las lista de factoreo asociada a cada prioridad, debido a que los valores maximo y minimo que nos
      * pasa el usuario podrian encontrarse entre la hoja mas izquierda y la hoja mas derecha del arbol, pero en promedio este servicio 
      * baja su complejidad a O(log n) * O(t), porque en muchas ocaciones no es necesario recorrer todo el arbol, ya que este corta antes
-     * cuando encuentra un valor contemplado dentro del rango.
+     * cuando encuentra un valor contemplado dentro del rango (de esta forma nos aseguramos que en el caso promedio hagamos menos accesos
+     * a memoria, pero en el peor de los casos es como recorrer todas las tarea).
      */
 	public List<Tarea> servicio3(int prioridadInferior, int prioridadSuperior) {
 		if(this.arbol.getRaiz() == null){
-			return new ArrayList<>();
+			return new LinkedList<>();
 		}
 		return buscarMinMax(this.arbol.getRaiz(),prioridadInferior,prioridadSuperior, new LinkedList<Tarea>());
 	}

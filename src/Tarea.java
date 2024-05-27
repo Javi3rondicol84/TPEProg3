@@ -19,7 +19,7 @@ public class Tarea {
 	}
 	
 	public Tarea(){
-		
+	
 	}
 
 	public String toString(){
