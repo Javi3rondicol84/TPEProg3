@@ -10,8 +10,8 @@ public class Procesador {
 	private Integer anio;
 	private LinkedList<Tarea> tareas;
 	private Integer cantCriticas;
-	private Integer tiempoTarea;
-	public static final int MAXCRITICAS = 2;
+	private Integer tiempoTareas;
+
 	
 	public Procesador(String id, String codigo, boolean refrigerado,Integer anio) {
 		this.id = id;
@@ -19,7 +19,7 @@ public class Procesador {
 		this.refrigerado = refrigerado;
 		this.anio = anio;
 		this.cantCriticas = 0;
-		this.tiempoTarea = 0;
+		this.tiempoTareas = 0;
 		this.tareas = new LinkedList<>();
 	}
 	
@@ -37,27 +37,42 @@ public class Procesador {
 		return suma;
 	}
 	
-	public void agregarTareas(Tarea tt, Integer tiempoMax){
-		if(tareas.contains(tt)){
-			return;
-		}
-		if(tt.isCritica() == true){
-			cantCriticas++;
-		}
-		if(cantCriticas < MAXCRITICAS){
-			if(!this.refrigerado){
-				if(tiempoTarea + tt.getTiempo() < tiempoMax){
-					this.tiempoTarea += tt.getTiempo();
-				}else{
-					return;
-				}
-			}
+	public Procesador copiar() {
+        Procesador copia = new Procesador(this.getId() , this.getCodigo(), this.isRefrigerado(), this.anio);
+        for (Tarea t : this.tareas) {
+            copia.agregarTareas(t);
+        }
+        return copia;
+    }
+	
+	public int getCantidadCriticas() {
+		return this.cantCriticas;
+	}
+	
+	public int getTiempoTareas() {
+		return this.tiempoTareas;
+	}
+	
+	public void agregarTareas(Tarea tt){
+		if(!tareas.contains(tt)){
 			tareas.add(tt);
+			if(tt.isCritica() == true) {
+				cantCriticas++;
+			}
+			tiempoTareas += tt.getTiempo();
 		}
 	}
 	
 	public String toString(){
-		return " id: "+ id + " codigo: " + codigo + " refrigerado: " + refrigerado + " año: " + anio + "\n";
+		return " id: "+ id + " codigo: " + codigo + " refrigerado: " + refrigerado + " aï¿½o: " + anio + "\n";
+	}
+	
+	public void remove(Tarea tt){
+		tareas.remove(tt);
+		if(tt.isCritica() == true) {
+			cantCriticas--;
+		}
+		tiempoTareas -= tt.getTiempo();
 	}
 	
 	/*public void traerTareas(){

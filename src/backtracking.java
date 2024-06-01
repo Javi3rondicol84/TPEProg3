@@ -1,90 +1,98 @@
 package tpe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class backtracking {
 	private Servicios servicios;
-	private HashMap<String,Boolean> visitado;
-	private int sumaMenor;
-	private int sumaMayor;
+	private LinkedList<Procesador> mejorSolucion;
+	private int menorTiempo;
+	private int mayorTiempo;
+	private HashMap<String,Boolean> visitados;
+	public static final int MAXCRITICAS = 2;
 	
 	
 	public backtracking(Servicios servicios){
 		this.servicios = servicios;
-		this.sumaMenor = 0;
-		this.sumaMayor = 0;
-		this.visitado = new HashMap<String,Boolean>();
-		rellenarHashMapTareas();
+		this.mejorSolucion = new LinkedList<Procesador>();
+		this.menorTiempo = 0;
+		this.mayorTiempo = 0;
+		this.visitados = new HashMap<>();
 	}
 	
-	private void rellenarHashMapTareas(){
-		 LinkedList<Tarea> tareas = servicios.getListaTareas();
-		 for(int i = 0; i < tareas.size(); i++){
-			 visitado.put(tareas.get(i).getId(), false);
-		 }
+	/*Asignación de tareas a procesadores. Se tienen m procesadores idénticos y n tareas con un tiempo
+	de ejecución dado. Se requiere encontrar una asignación de tareas a procesadores de manera de
+	minimizar el tiempo de ejecución del total de tareas.*/
+
+	private void rellenarAll(){
+		for(Tarea t : servicios.getListaTareas()){
+			visitados.put(t.getId(), false);
+		}
 	}
 	
-	public LinkedList<Procesador> asignarTareas(){
-		 LinkedList<Procesador> procesadores = servicios.getListaProcesadores();
-		 LinkedList<Tarea> tareas = servicios.getListaTareas();
-		 int suma = 0;
-		 Iterator<Procesador> it = procesadores.iterator();
-		 while(it.hasNext()){
-			 Procesador pp = it.next();
-			 asignarTareas(tareas,suma,pp,new Tarea());
-		 }
-		 return procesadores;
+	public LinkedList<Procesador> asignarTareas(int tiempoMaximo){
+		this.rellenarAll();
+		int indice = 0;
+		asignarTareas(new Tarea(), new Procesador(),indice,tiempoMaximo);
+		return mejorSolucion;
 	}
 	
-	private void asignarTareas(LinkedList<Tarea> tareas,int suma,Procesador pa,Tarea tt){
-		Iterator<Tarea> it = tareas.iterator();
-		visitado.put(tt.getId(),true);
-		while(it.hasNext()){
-			Tarea tt1 = it.next();
-			if(!visitado.get(tt1.getId())){
-				pa.agregarTareas(tt1,10);
-				asignarTareas(tareas,suma,pa,tt1);
+	private int mayorTiempo(LinkedList<Procesador> procesadores){
+		int sumaMayor = 0;
+		int suma = 0;
+		for(Procesador pp : procesadores){
+			suma = pp.getSumas();
+			if(suma > sumaMayor){
+				sumaMayor = suma;
 			}
 		}
-		//visitado.put(tt.getId(),false);
+		return sumaMayor;
+	}
+	
+	private void asignarTareas(Tarea t, Procesador p,int indice, int tiempoMaximo){
+		if(indice == servicios.getListaTareas().size()){
+			mayorTiempo = mayorTiempo(servicios.getListaProcesadores());
+			if(mayorTiempo < menorTiempo || menorTiempo == 0){
+				menorTiempo = mayorTiempo;
+				mejorSolucion.clear();
+				for (Procesador pp : this.servicios.getListaProcesadores()) {
+                    mejorSolucion.add(pp.copiar());
+                }
+			}
+			
+		}else{
+			Tarea tt = servicios.getListaTareas().get(indice);
+			for(Procesador pp : servicios.getListaProcesadores()){
+				String id = tt.getId();
+				if(!visitados.get(id)){
+					visitados.put(id,true);
+					if(validarTarea(pp,tt, tiempoMaximo)) {
+						pp.agregarTareas(tt);
+						indice++;
+						asignarTareas(tt, pp, indice, tiempoMaximo);
+						pp.remove(tt);
+						indice--;
+					}
+					visitados.put(id,false);
+				}
+			}
+		}
 	}
 	
 	
-	/*private void asignarTareas(LinkedList<Tarea> tareas, LinkedList<Procesador> procesadores,boolean x,int suma){
-		Iterator<Tarea> itt = tareas.iterator();
-		Iterator<Procesador> itp = procesadores.iterator();
-		if(sumaMayor < sumaMenor || sumaMenor == 0){
-			sumaMenor = sumaMayor;
-			//obtuvimos una mejor solucion
-		}
-			while(itp.hasNext()){
-				Procesador pp = itp.next();
-				suma = getSumaProc(pp);
-				if(suma > sumaMayor){
-					sumaMayor = suma;
+	private boolean validarTarea(Procesador pp, Tarea tt, int tiempoMax) {
+		if(pp.getCantidadCriticas() < MAXCRITICAS){
+			if(!pp.isRefrigerado()){
+				if(pp.getTiempoTareas() < tiempoMax){
+					return true;
+				}else{
+					return false;
 				}
-				while(itt.hasNext() && !x){
-					Tarea tt = itt.next();
-					if(!visitado.get(tt.getId())){
-						visitado.put(tt.getId(),true);
-						if(pp.getTareas().size() < 3){
-							pp.agregarTareas(tt);
-							//hacer dfs o arbol de estados
-							asignarTareas(tareas,procesadores,x,suma);
-						}else{
-							x = true;
-							visitado.put(tt.getId(),false);
-						}
-			//			suma = suma - tt.getTiempo();
-					}
-				}
-				x = false;
+			}
+			return true;
 		}
-	}*/
-	
-	private int getSumaProc(Procesador pp){
-		return pp.getSumas();
+			return false;
 	}
 }
