@@ -1,7 +1,7 @@
 package tpe;
 
 
-public class Tarea {
+public class Tarea implements Comparable<Tarea>{
 	
 	private String id;
 	private String nombre;
@@ -73,6 +73,12 @@ public class Tarea {
 
 	public void setPrioridad(Integer prioridad) {
 		this.prioridad = prioridad;
+	}
+
+	@Override
+	public int compareTo(Tarea tt) {
+		int result = this.getTiempo() - tt.getTiempo();
+		return result;
 	}
 	
 	

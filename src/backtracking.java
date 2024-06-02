@@ -1,11 +1,10 @@
 package tpe;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 
-public class backtracking {
+public class Backtracking {
 	private Servicios servicios;
 	private LinkedList<Procesador> mejorSolucion;
 	private int menorTiempo;
@@ -14,7 +13,7 @@ public class backtracking {
 	public static final int MAXCRITICAS = 2;
 	
 	
-	public backtracking(Servicios servicios){
+	public Backtracking(Servicios servicios){
 		this.servicios = servicios;
 		this.mejorSolucion = new LinkedList<Procesador>();
 		this.menorTiempo = 0;
@@ -61,7 +60,6 @@ public class backtracking {
                     mejorSolucion.add(pp.copiar());
                 }
 			}
-			
 		}else{
 			Tarea tt = servicios.getListaTareas().get(indice);
 			for(Procesador pp : servicios.getListaProcesadores()){
@@ -85,7 +83,7 @@ public class backtracking {
 	private boolean validarTarea(Procesador pp, Tarea tt, int tiempoMax) {
 		if(pp.getCantidadCriticas() < MAXCRITICAS){
 			if(!pp.isRefrigerado()){
-				if(pp.getTiempoTareas() < tiempoMax){
+				if(pp.getTiempoTareas() + tt.getTiempo() < tiempoMax){
 					return true;
 				}else{
 					return false;
@@ -95,4 +93,13 @@ public class backtracking {
 		}
 			return false;
 	}
+	
+	public int getTiempoFinal(){
+		return this.menorTiempo;
+	}
 }
+
+
+
+
+

@@ -1,6 +1,6 @@
 package tpe;
 
-import java.util.ArrayList;
+
 import java.util.LinkedList;
 
 public class Procesador {
@@ -74,14 +74,6 @@ public class Procesador {
 		}
 		tiempoTareas -= tt.getTiempo();
 	}
-	
-	/*public void traerTareas(){
-		for(int i = 0; i < tareas.size(); i++){
-			System.out.println(tareas.get(i).getId() + " " + tareas.get(i).getNombre() + " " + tareas.get(i).getPrioridad()
-					+ " " + tareas.get(i).getTiempo() + " " + tareas.get(i).isCritica());
-		}
-	}*/
-
 
 	public String getId() {
 		return id;
