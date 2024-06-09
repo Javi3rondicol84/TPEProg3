@@ -10,6 +10,9 @@ public class Backtracking {
 	private int menorTiempo;
 	private int mayorTiempo;
 	private HashMap<String,Boolean> visitados;
+	private boolean haySolucion;
+	private int cantTareas;
+	private int cantEstados;
 	public static final int MAXCRITICAS = 2;
 	
 	
@@ -18,6 +21,9 @@ public class Backtracking {
 		this.mejorSolucion = new LinkedList<Procesador>();
 		this.menorTiempo = 0;
 		this.mayorTiempo = 0;
+		this.haySolucion = false;
+		this.cantEstados = 0;
+		this.cantTareas = 0;
 		this.visitados = new HashMap<>();
 	}
 	
@@ -29,13 +35,6 @@ public class Backtracking {
 		for(Tarea t : servicios.getListaTareas()){
 			visitados.put(t.getId(), false);
 		}
-	}
-	
-	public LinkedList<Procesador> asignarTareas(int tiempoMaximo){
-		this.rellenarAll();
-		int indice = 0;
-		asignarTareas(new Tarea(), new Procesador(),indice,tiempoMaximo);
-		return mejorSolucion;
 	}
 	
 	private int mayorTiempo(LinkedList<Procesador> procesadores){
@@ -50,7 +49,25 @@ public class Backtracking {
 		return sumaMayor;
 	}
 	
-	private void asignarTareas(Tarea t, Procesador p,int indice, int tiempoMaximo){
+	/* La estrategia de backtraking consiste en ir considerando una tarea por cada procesador (dentro de que se cumplan los 
+	 * criterios de que esa tarea puede ser agregada en ese procesador) e ir llamando recursivamente por cada tarea para que
+	 * vuelva a considerar nuevamente todas las opciones disponibles (no se considera la tarea agregada previamente) y para obtener 
+	 * la solucion, llegamos a un estado final donde todas las tareas se asignaron, quedandonos asi el procesador con mayor carga 
+	 * de esa solucion y comparandola con otro posible estado final, donde volvemos a comparar ambas cargas de los procesadores 
+	 * y nos quedamos con el que tiene la menor carga.
+	 */
+
+	
+	public LinkedList<Procesador> asignarTareas(int tiempoMaximo){
+		this.rellenarAll();
+		int indice = 0;
+		asignarTareas(indice,tiempoMaximo);
+		return mejorSolucion;
+		
+	}
+	
+	private void asignarTareas(int indice, int tiempoMaximo){
+		cantEstados++;
 		if(indice == servicios.getListaTareas().size()){
 			mayorTiempo = mayorTiempo(servicios.getListaProcesadores());
 			if(mayorTiempo < menorTiempo || menorTiempo == 0){
@@ -67,21 +84,26 @@ public class Backtracking {
 				if(!visitados.get(id)){
 					visitados.put(id,true);
 					if(validarTarea(pp,tt, tiempoMaximo)) {
+						cantTareas++;
 						pp.agregarTareas(tt);
 						indice++;
-						asignarTareas(tt, pp, indice, tiempoMaximo);
+						asignarTareas(indice, tiempoMaximo);
 						pp.remove(tt);
 						indice--;
+						cantTareas--;
 					}
 					visitados.put(id,false);
 				}
 			}
 		}
+		if(cantTareas == servicios.getListaTareas().size()) {
+			haySolucion = true;
+		}
 	}
 	
 	
 	private boolean validarTarea(Procesador pp, Tarea tt, int tiempoMax) {
-		if(pp.getCantidadCriticas() < MAXCRITICAS){
+		if(pp.getCantidadCriticas() < MAXCRITICAS || !tt.isCritica()){
 			if(!pp.isRefrigerado()){
 				if(pp.getTiempoTareas() + tt.getTiempo() < tiempoMax){
 					return true;
@@ -96,6 +118,15 @@ public class Backtracking {
 	
 	public int getTiempoFinal(){
 		return this.menorTiempo;
+	}
+	
+	public int getCantEstados() {
+		return cantEstados;
+	} 
+	
+	
+	public boolean haySolucion(){
+		return haySolucion;
 	}
 }
 
