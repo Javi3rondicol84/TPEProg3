@@ -95,7 +95,7 @@ public class Greedy {
 			tiempo = tt.getTiempo() + pc.getSumas();
 			cantCandidatos++;
 			if(tiempo < tiempoMenor || tiempoMenor == 0) {
-				if(pc.getCantidadCriticas() < MAXCRITICAS){
+				if(pc.getCantidadCriticas() < MAXCRITICAS || !tt.isCritica()){
 					if(!pc.isRefrigerado()){
 						if(pc.getTiempoTareas() + tt.getTiempo() < tiempoMax){
 							tiempoMenor = tiempo;
